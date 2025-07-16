@@ -1,0 +1,55 @@
+/* src/Components/UploaderBox.css */
+.Container{
+  border: 2px solid black;
+  width: 90%;
+  border-radius: 8px;
+  padding: 10px 10px 10px 10px;
+  height: 320px;
+  align-content: center;
+  justify-content: center;
+}
+
+.upload-box {
+    border: 2px dashed #ccc;
+    width: auto;
+    height: 300px;
+    border-radius: 8px;
+    
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  .upload-box.drag-over {
+    background-color: #f0f8ff;
+    border-color: #3399ff;
+    
+  }
+  
+  .upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .upload-content .icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .upload-content .primary-text {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 0.25rem;
+    
+  }
+  
+  .upload-content .primary-text .browse {
+    color: #007bff;
+    text-decoration: underline;
+  }
+  
+  .upload-content .support-text {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  

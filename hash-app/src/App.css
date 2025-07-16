@@ -1,0 +1,90 @@
+/* src/App.css */
+.App {
+  text-align: center;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+.App-header h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  background: white;
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #28a745;
+  color: white;
+}
+
+.status {
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: #555;
+}
+
+.progress-bar {
+  width: 80%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  margin: 0.5rem auto;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #28a745;
+  transition: width 0.2s;
+}
+
+.results {
+  width: 90%;
+  margin: 1rem auto;
+  border-collapse: collapse;
+}
+
+.results th,
+.results td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.results th {
+  background: #f8f8f8;
+}

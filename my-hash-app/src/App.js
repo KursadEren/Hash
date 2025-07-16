@@ -2,82 +2,100 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 // SHA-256 modülleri
-import { createPaddedBlock_256 } from './Components/Function/createPaddedBlock_256';
-import { bitsToBytes }          from './Components/Function/bitsToBayt';
-import { divideBlock_256 }     from './Components/Function/divideBlock_256';
-import { makeSchedule_256 }     from './Components/Function/makeSchedule_256';
-import { processBlock_256 }     from './Components/Function/processBlock_256';
-import { H_INIT_256 }           from './Components/Constants/Sha-256CompParameter';
+import { SHA_256 } from './Components/Function/calculateSha-256';
 
-// SHA-512 modülleri
-import { createPaddedBlock_512 }  from './Components/Function/createPaddedBlock_512'
-import { divideBlock_512 }       from './Components/Function/divideBlock_512';
-import { makeSchedule_512 }       from './Components/Function/makeSchedule_512';
-import { processBlock_512 }       from './Components/Function/processBlock_512';
-import { H_INIT_512 }             from './Components/Constants/Sha-512CompParameter';
-
+import { downloadRandomDummyFile } from './Components/Function/DownloadDummyFile';
+import Uploader from './Components/Uploader';
+import { SHA_512 } from './Components/Function/calculateSha-512';
 
 function App() {
-  const [digest_256, setDigest_256] = useState("");
-  const [digest_512, setDigest_512] = useState("");
+  const [fileInfo, setFileInfo] = useState(null);
+  const [downloadStatus, setDownloadStatus] = useState('');
+  const [results, setResults] = useState([])
   useEffect(() => {
-    SHA_256();
-    SHA_512();
+
   }, [])
 
-  function SHA_512(){
-    const H = Array.from(H_INIT_512);
-    const text = "abcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdff"
-    const paddedBytes = createPaddedBlock_512(text);
-    const BaytText = bitsToBytes(paddedBytes);
-    const blocks      = divideBlock_512(BaytText);
-    console.log(blocks,"blocks")
-    for (const block of blocks) {
-      const W = makeSchedule_512(block);             
-      processBlock_512(H, W);                      
+  const handleHash = async () => {
+    if (!fileInfo) return
+    // 1) Dosyayı ArrayBuffer olarak oku
+    const buffer = await fileInfo.arrayBuffer()
+    const bytes = new Uint8Array(buffer)
+    const CHUNK = 1 * 1024 * 1024  // 1 MiB
+    const count = Math.ceil(bytes.length / CHUNK)
+    const temp = []
+
+    for (let i = 0; i < count; i++) {
+      const start = i * CHUNK
+      const end = Math.min(start + CHUNK, bytes.length)
+      const chunk = bytes.slice(start, end)
+      // 2) Baytları metne çevir
+      const text = new TextDecoder().decode(chunk)
+      // 3) SHA fonksiyonlarını çağır
+      const sha256 = SHA_256(text)
+      const sha512 = SHA_512(text)
+      temp.push({ idx: i + 1, sha256, sha512 })
     }
 
-    const hex = [...H]
-      .map(x => x.toString(16).padStart(16, '0'))
-      .join('');
-      setDigest_512(hex);
-
+    setResults(temp)
   }
-  
 
-  function SHA_256() 
-  {
-    
-    const H = Uint32Array.from(H_INIT_256);
-    const text = "abcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdffabcdff"
-    const BinaryText = createPaddedBlock_256(text, 256);
-    console.log(BinaryText)
-    const BaytText = bitsToBytes(BinaryText);
-    const blocks = divideBlock_256(BaytText);
-    console.log(blocks,"blocks")
-    for (const block of blocks) {
-      const W = makeSchedule_256(block);             
-      processBlock_256(H, W);                      
+  const handleDownload = () => {
+    try {
+      // 100 MB’lık dosya indir
+      downloadRandomDummyFile(100);
+      setDownloadStatus('İndirme başlatıldı…');
+    } catch (err) {
+      console.error(err);
+      setDownloadStatus('İndirme sırasında hata oluştu.');
     }
+  };
 
-    const hex = [...H]
-      .map(x => x.toString(16).padStart(8, '0'))
-      .join('');
-      setDigest_256(hex);
-
-  
-  }
   return (
     <div className="App">
       <header className="App-header">
-        <h2>SHA-256 Özet</h2>
-     
-        <code style={{ wordBreak: 'break-all' }}>{digest_256}</code>
-        <h2>SHA-512 Özet</h2>
-     
-     <code style={{ wordBreak: 'break-all' }}>{digest_512}</code>
-      </header>
+        <h1>SHA Hash Uygulaması</h1>
+        </header>  
+       
+        <div className="controls">
+
+
+          <Uploader onFileSelected={file => setFileInfo(file)} />
+          <button onClick={handleDownload}>
+            Rastgele dosya üret ve indir
+          </button>
+
+        </div>
+        <div>
+          <button onClick={handleHash} disabled={!fileInfo}>
+            Dosyayı 1 MiB’lik bloklara böl ve hashle
+          </button>
+        </div>
+        <>
+          {results.length > 0 && (
+            <table className="results">
+              <thead>
+                <tr>
+                  <th>Blok No</th>
+                  <th>SHA-256</th>
+                  <th>SHA-512</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map(r => (
+                  <tr key={r.idx}>
+                    <td>{r.idx}</td>
+                    <td><code>{r.sha256}</code></td>
+                    <td><code>{r.sha512}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+       
     </div>
+
   );
 }
 
